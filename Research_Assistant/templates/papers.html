@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papers - MCP Research Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="sidebar-header">
+                    <h3>MCP Research Assistant</h3>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-comment-dots"></i> Chat
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/research">
+                            <i class="fas fa-search"></i> Research
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/papers">
+                            <i class="fas fa-file-alt"></i> Papers
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="sidebar-section">
+                    <h5>Current Topics</h5>
+                    <div id="topics-list" class="topics-list">
+                        <div class="placeholder-text">No topics yet</div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-section">
+                    <h5>Actions</h5>
+                    <button id="view-context-btn" class="btn btn-outline-secondary btn-sm w-100 mb-2">
+                        <i class="fas fa-eye"></i> View Context
+                    </button>
+                    <button id="get-citations-btn" class="btn btn-outline-info btn-sm w-100">
+                        <i class="fas fa-quote-left"></i> View Citations
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="papers-container">
+                    <div class="papers-header">
+                        <h2>Research Papers</h2>
+                        <p>View and analyze papers in your research context</p>
+                    </div>
+                    
+                    <div class="papers-list-container">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5>Your Papers</h5>
+                                <div class="spinner-border text-primary d-none" role="status" id="papers-spinner">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="papers-list" class="papers-list">
+                                    <div class="placeholder-text">No papers in your research context yet</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="add-paper-container mt-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Add a Paper Manually</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="add-paper-form">
+                                    <div class="mb-3">
+                                        <label for="paper-title" class="form-label">Title</label>
+                                        <input type="text" class="form-control" id="paper-title" placeholder="Enter paper title">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="paper-authors" class="form-label">Authors</label>
+                                        <input type="text" class="form-control" id="paper-authors" placeholder="Enter authors (comma separated)">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="paper-abstract" class="form-label">Abstract</label>
+                                        <textarea class="form-control" id="paper-abstract" rows="4" placeholder="Enter paper abstract"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="paper-year" class="form-label">Year</label>
+                                        <input type="number" class="form-control" id="paper-year" placeholder="Enter publication year">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="paper-url" class="form-label">URL (optional)</label>
+                                        <input type="url" class="form-control" id="paper-url" placeholder="Enter paper URL">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Add Paper</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="citations-container mt-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Citations</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="citations-list" class="citations-list">
+                                    <div class="placeholder-text">No citations yet</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for displaying context -->
+    <div class="modal fade" id="contextModal" tabindex="-1" aria-labelledby="contextModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="contextModalLabel">Research Context</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <pre id="context-content" class="context-content"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for paper details -->
+    <div class="modal fade" id="paperDetailsModal" tabindex="-1" aria-labelledby="paperDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paperDetailsModalLabel">Paper Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="paper-details" class="paper-details">
+                        <!-- Paper details will be added here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="analyze-paper-btn">Analyze Paper</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for citations -->
+    <div class="modal fade" id="citationsModal" tabindex="-1" aria-labelledby="citationsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="citationsModalLabel">Citations</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="citations-modal-content" class="citations-modal-content">
+                        <!-- Citations will be added here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/static/js/papers.js"></script>
+</body>
+</html>
